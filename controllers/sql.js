@@ -1,17 +1,10 @@
 var config = require('../config/config');
 var fs = require('fs');
+var config = require('../config/config');
 
 var mysql = require('mysql');
 
-var pool  = mysql.createPool({
-	connectionLimit : 10,
-	host     : 'localhost',
-	user     : 'root',
-	password : 'bitnami',
-	database : 'testdb',
-	supportBigNumbers : 'true',
-
-});
+var pool  = mysql.createPool(config.mysql);
 
 exports.getStats = function(req, res) {
 	var params = parseQuery(req);
@@ -22,7 +15,9 @@ exports.getStats = function(req, res) {
 				throw new Error("sql error");
 			}
 			connection.release();
-			doMagicWithRows(rows, req, res);
+			//doMagicWithRows(rows, req, res);
+
+			res.send(rows);
 		});
 	});
 };
@@ -68,6 +63,8 @@ function prepareQuery(params) {
 	getValues(params).forEach( function(elem, i) {
 		string = string.replace("%" + (i+1), elem);
 	});
+
+	console.log(string);
 
 	return string;	
 };
@@ -125,7 +122,7 @@ function loopStatistics(rows, actions) {
 function returnStatisticObj(elem, actions) {
 	return {
 		impressions: elem.impressions,
-		clicks: elem.impressions,
+		clicks: elem.clicks,
 		spent: elem.spent,
 		ctr: elem.ctr,
 		cpc: elem.cpc,

@@ -20,4 +20,5 @@ WHERE
 	AND b.date BETWEEN '%3' AND '%4'
 	AND a.ad_id IN (%5)
 	AND b.ad_id IN (%6)
+	AND b.ad_id = a.ad_id
 GROUP BY a.ad_id, b.action;
