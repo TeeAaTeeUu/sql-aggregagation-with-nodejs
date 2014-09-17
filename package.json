@@ -1,0 +1,9 @@
+{
+  "name": "API-for-SQL",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "4.9.0",
+    "mysql": "^2.5.0"
+  }
+}
