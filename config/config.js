@@ -9,7 +9,7 @@ var config = {
 			password : 'bitnami',
 			database : 'testdb',
 			supportBigNumbers : 'true',
-
+			multipleStatements: true
 		}
 	}
 };

@@ -12,7 +12,7 @@ exports.getStats = function(req, res) {
 	pool.getConnection(function(err, connection) {
 		connection.query(prepareQuery(params), function(err, rows) {
 			if(err) {
-				throw new Error("sql error");
+				throw new Error("sql error " + err);
 			}
 			connection.release();
 			doMagicWithRows(rows, req, res);
@@ -89,7 +89,7 @@ function doMagicWithRows (rows, req, res) {
 function loopActions(rows) {
 	var actions = {};
 
-	rows.forEach( function(elem) {
+	rows[1].forEach( function(elem) {
 		actions[elem.ad_id] = actions[elem.ad_id] || {};
 
 		actions[elem.ad_id][elem.action] = {
@@ -103,14 +103,9 @@ function loopActions(rows) {
 
 function loopStatistics(rows, actions) {
 	var statistics = {};
-	var ad_ids = [];
 
-	rows.forEach( function (elem) {
-		if(ad_ids.indexOf(elem.ad_id) == -1) {
-			ad_ids.push = elem.ad_id;
-
-			statistics[elem.ad_id] = returnStatisticObj(elem, actions);
-		};
+	rows[0].forEach( function (elem) {
+		statistics[elem.ad_id] = returnStatisticObj(elem, actions);
 	});
 	return statistics;
 };
