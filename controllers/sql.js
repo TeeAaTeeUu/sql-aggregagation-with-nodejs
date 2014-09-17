@@ -9,15 +9,14 @@ var pool  = mysql.createPool(config.mysql);
 exports.getStats = function(req, res) {
 	var params = parseQuery(req);
 
-	pool.getConnection(function(err, connection) {
-		connection.query(prepareQuery(params), function(err, rows) {
+	prepareQuery(params, function(query) {
+		pool.getConnection(function(err, connection) {
 			if(err) {
-				throw new Error("sql error " + err);
-			}
-			connection.release();
-			doMagicWithRows(rows, req, res);
+				throw new Error(("sql connection error " + err))
+			};
+			doQuery(connection, query, req, res);
 		});
-	});
+	})
 };
 
 function parseQuery(req) {
@@ -55,14 +54,13 @@ function checkEndDate(req) {
 	}
 };
 
-function prepareQuery(params) {
-	var string = readFile("sql/select.sql")
-
-	getValues(params).forEach( function(elem, i) {
-		string = string.replace("%" + (i+1), elem);
+function prepareQuery(params, callback) {
+	fs.readFile("./sql/select.sql", "utf8", function(err, string) {
+		getValues(params).forEach( function(elem, i) {
+			string = string.replace("%" + (i+1), elem)
+		});
+		callback(string);
 	});
-
-	return string;	
 };
 
 function getValues(params) {
@@ -74,10 +72,16 @@ function getValues(params) {
 	params.ad_ids,
 	params.ad_ids
 	];
-}
+};
 
-function readFile (file) {
-	return fs.readFileSync("./" + file, "utf8");
+function doQuery(connection, query, req, res) {
+	connection.query(query, function(err, rows) {
+		if(err) {
+			throw new Error("sql error " + err);
+		}
+		connection.release();
+		doMagicWithRows(rows, req, res);
+	});
 };
 
 function doMagicWithRows (rows, req, res) {
