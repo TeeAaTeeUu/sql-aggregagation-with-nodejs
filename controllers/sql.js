@@ -15,9 +15,7 @@ exports.getStats = function(req, res) {
 				throw new Error("sql error");
 			}
 			connection.release();
-			//doMagicWithRows(rows, req, res);
-
-			res.send(rows);
+			doMagicWithRows(rows, req, res);
 		});
 	});
 };
@@ -63,8 +61,6 @@ function prepareQuery(params) {
 	getValues(params).forEach( function(elem, i) {
 		string = string.replace("%" + (i+1), elem);
 	});
-
-	console.log(string);
 
 	return string;	
 };
